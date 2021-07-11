@@ -21,25 +21,23 @@ public class player : MonoBehaviour
     public SpriteRenderer sprite;
 
     private Animator anim;
+    private float timer;
+
+    public int maxHealth = 100;
+    int currentHealth;
 
     private void Start()
     {
+        currentHealth = maxHealth;
         anim = GetComponent<Animator>();
     }
 
     void Update()
     {
+
         move();
         moveAttackPoint();
-
-        if(Input.GetAxisRaw("Horizontal") < 0)
-        {
-            sprite.flipX = true;
-        }
-        if (Input.GetAxisRaw("Horizontal") > 0)
-        {
-            sprite.flipX = false;
-        }
+        flip();
 
 
         if (Time.time >= nextAttackTime)
@@ -68,12 +66,17 @@ public class player : MonoBehaviour
         movement.y = Input.GetAxisRaw("Vertical");
     }
 
+    void flip()
+    {
+        if ((attackPoint.position - transform.position).x > 0) sprite.flipX = false;
+        else sprite.flipX = true;
+    }
+    
+
 
     void attack()
     {
-
-        anim.SetBool("Attacking", true);
-
+        StartCoroutine(playerAnimation());
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
         
         foreach (Collider2D enemy in hitEnemies)
@@ -102,6 +105,29 @@ public class player : MonoBehaviour
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
         equipPoint.eulerAngles = new Vector3(0, 0, angle);
+    }
+
+    private IEnumerator playerAnimation()
+    {
+        anim.Play("attackAnimation");
+        yield return new WaitForSeconds(0.5f);
+        anim.Play("IdleAnimation");
+
+        yield break;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        if(currentHealth < 1)
+        {
+            DEATH();
+        }
+    }
+
+    void DEATH()
+    {
 
     }
+   
 }
