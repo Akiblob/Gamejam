@@ -41,6 +41,7 @@ public class player : MonoBehaviour
         moveAttackPoint();
         flip();
         WalkAnim();
+        WalkSpeed();
 
         if (Time.time >= nextAttackTime)
         {
@@ -140,6 +141,22 @@ public class player : MonoBehaviour
             {
                 anim.Play("IdleAnimation");
             }
+        }
+    }
+
+    public void WalkSpeed()
+    {
+        if(Input.GetAxisRaw("Horizontal") < 0 && sprite.flipX == false)
+        {
+            speed = 5f;
+        }
+        else if (Input.GetAxisRaw("Horizontal") > 0 && sprite.flipX == true)
+        {
+            speed = 5f;
+        }
+        else
+        {
+            speed = 10f;
         }
     }
 
