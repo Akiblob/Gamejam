@@ -22,9 +22,12 @@ public class player : MonoBehaviour
 
     private Animator anim;
     private float timer;
+    private bool playerAttack = false;
 
     public int maxHealth = 100;
     int currentHealth;
+
+    public GameObject feet;
 
     private void Start()
     {
@@ -34,11 +37,10 @@ public class player : MonoBehaviour
 
     void Update()
     {
-
         move();
         moveAttackPoint();
         flip();
-
+        WalkAnim();
 
         if (Time.time >= nextAttackTime)
         {
@@ -68,8 +70,16 @@ public class player : MonoBehaviour
 
     void flip()
     {
-        if ((attackPoint.position - transform.position).x > 0) sprite.flipX = false;
-        else sprite.flipX = true;
+        if ((attackPoint.position - transform.position).x > 0)
+        {
+            sprite.flipX = false;
+            feet.GetComponent<feet>().flipFeet(false);
+        }
+        else
+        {
+            sprite.flipX = true;
+            feet.GetComponent<feet>().flipFeet(true);
+        }
     }
     
 
@@ -110,10 +120,27 @@ public class player : MonoBehaviour
     private IEnumerator playerAnimation()
     {
         anim.Play("attackAnimation");
+        playerAttack = true;
         yield return new WaitForSeconds(0.5f);
         anim.Play("IdleAnimation");
+        playerAttack = false;
 
         yield break;
+    }
+
+    private void WalkAnim()
+    {
+        if (!playerAttack)
+        {
+            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+            {
+                anim.Play("walk");
+            }
+            else
+            {
+                anim.Play("IdleAnimation");
+            }
+        }
     }
 
     public void TakeDamage(int damage)
